@@ -78,18 +78,34 @@ export default function Copy({ children, animateOnScroll = true, delay = 0 }) {
           }
 
           if (!currentLines || currentLines.length === 0) {
-            // safe fallback: wrap element once, animate as a whole block
-            const wrapper = document.createElement("span");
-            wrapper.className = "copy__line";
-            wrapper.style.display = "block";
-            wrapper.style.overflow = "hidden";
-            const inner = document.createElement("span");
-            inner.style.display = "inline-block";
-            inner.style.transform = "translateY(100%)";
-            while (element.firstChild) inner.appendChild(element.firstChild);
-            wrapper.appendChild(inner);
-            element.appendChild(wrapper);
-            currentLines = [inner];
+            // fallback: animate the element itself (no DOM restructuring to avoid layout shift)
+            const anim = () => {
+              const cfg = {
+                y: 0,
+                opacity: 1,
+                duration: 0.8,
+                ease: "power3.out",
+                delay,
+              };
+              if (animateOnScroll) {
+                gsap.fromTo(
+                  element,
+                  { y: 20, opacity: 0 },
+                  {
+                    ...cfg,
+                    scrollTrigger: {
+                      trigger: element,
+                      start: "top 80%",
+                      once: true,
+                    },
+                  }
+                );
+              } else {
+                gsap.fromTo(element, { y: 20, opacity: 0 }, cfg);
+              }
+            };
+            anim();
+            return; // skip pushing lines for this element
           }
 
           lines.current.push(...currentLines);
@@ -103,7 +119,7 @@ export default function Copy({ children, animateOnScroll = true, delay = 0 }) {
           delay: delay,
         };
 
-        if (animateOnScroll) {
+        if (lines.current.length && animateOnScroll) {
           gsap.to(lines.current, {
             ...animationProps,
             scrollTrigger: {
@@ -112,7 +128,7 @@ export default function Copy({ children, animateOnScroll = true, delay = 0 }) {
               once: true,
             },
           });
-        } else {
+        } else if (lines.current.length) {
           gsap.to(lines.current, animationProps);
         }
       };
