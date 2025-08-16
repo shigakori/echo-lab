@@ -112,6 +112,14 @@ export default function Copy({ children, animateOnScroll = true, delay = 0 }) {
           lines.current.push(...currentLines);
         });
 
+        // animate inner targets (firstElementChild of each line) to preserve mask layout
+        const animateTargets = lines.current.map((line) =>
+          line && line.firstElementChild ? line.firstElementChild : line
+        );
+
+        // ensure initial state for targets that might not have CSS applied
+        gsap.set(animateTargets, { y: "100%" });
+
         const animationProps = {
           y: "0%",
           duration: 1,
@@ -120,8 +128,8 @@ export default function Copy({ children, animateOnScroll = true, delay = 0 }) {
           delay: delay,
         };
 
-        if (lines.current.length && animateOnScroll) {
-          gsap.to(lines.current, {
+        if (animateTargets.length && animateOnScroll) {
+          gsap.to(animateTargets, {
             ...animationProps,
             scrollTrigger: {
               trigger: containerRef.current,
@@ -129,8 +137,8 @@ export default function Copy({ children, animateOnScroll = true, delay = 0 }) {
               once: true,
             },
           });
-        } else if (lines.current.length) {
-          gsap.to(lines.current, animationProps);
+        } else if (animateTargets.length) {
+          gsap.to(animateTargets, animationProps);
         }
       };
 
