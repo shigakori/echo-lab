@@ -47,7 +47,7 @@ export default function Copy({ children, animateOnScroll = true, delay = 0 }) {
         lines.current = [];
         elementRefs.current = [];
 
-        // dynamic import SplitText (real plugin or stub via alias)
+        // dynamic import SplitText (real plugin locally; stub on GH Pages)
         let SplitTextMod = null;
         try {
           SplitTextMod = (await import("gsap/SplitText")).SplitText;
@@ -90,18 +90,19 @@ export default function Copy({ children, animateOnScroll = true, delay = 0 }) {
               if (animateOnScroll) {
                 gsap.fromTo(
                   element,
-                  { y: 20, opacity: 0 },
+                  { y: 40, opacity: 0 },
                   {
                     ...cfg,
+                    duration: 0.9,
                     scrollTrigger: {
                       trigger: element,
-                      start: "top 80%",
+                      start: "top 85%",
                       once: true,
                     },
                   }
                 );
               } else {
-                gsap.fromTo(element, { y: 20, opacity: 0 }, cfg);
+                gsap.fromTo(element, { y: 40, opacity: 0 }, cfg);
               }
             };
             anim();

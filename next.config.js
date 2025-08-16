@@ -1,6 +1,8 @@
 const path = require("path");
 
 const isGithubActions = process.env.GITHUB_ACTIONS === "true";
+const useSplitTextStub =
+  isGithubActions || process.env.NEXT_PUBLIC_USE_SPLITTEXT_STUB === "1";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 const nextConfig = {
@@ -14,8 +16,13 @@ const nextConfig = {
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
       "@": path.resolve(__dirname, "src"),
-      "gsap/SplitText": path.resolve(__dirname, "src/lib/splitTextStub.js"),
     };
+    if (useSplitTextStub) {
+      config.resolve.alias["gsap/SplitText"] = path.resolve(
+        __dirname,
+        "src/lib/splitTextStub.js"
+      );
+    }
     return config;
   },
 };
