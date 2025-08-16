@@ -13,6 +13,7 @@ const nextConfig = {
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
       "@": path.resolve(__dirname, "src"),
+      "gsap/SplitText": path.resolve(__dirname, "src/lib/splitTextStub.js"),
     };
     return config;
   },
