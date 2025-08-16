@@ -3,11 +3,10 @@ import "./Copy.css";
 import React, { useRef } from "react";
 
 import gsap from "gsap";
-import { SplitText } from "gsap/SplitText";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
-gsap.registerPlugin(SplitText, ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Copy({ children, animateOnScroll = true, delay = 0 }) {
   const containerRef = useRef(null);
@@ -48,6 +47,14 @@ export default function Copy({ children, animateOnScroll = true, delay = 0 }) {
         lines.current = [];
         elementRefs.current = [];
 
+        // dynamic import SplitText (real plugin or stub via alias)
+        let SplitTextMod = null;
+        try {
+          SplitTextMod = (await import("gsap/SplitText")).SplitText;
+        } catch (_) {
+          SplitTextMod = null;
+        }
+
         let elements = [];
         if (containerRef.current.hasAttribute("data-copy-wrapper")) {
           elements = Array.from(containerRef.current.children);
@@ -58,29 +65,35 @@ export default function Copy({ children, animateOnScroll = true, delay = 0 }) {
         elements.forEach((element) => {
           elementRefs.current.push(element);
 
-          const split = SplitText.create(element, {
-            type: "lines",
-            mask: "lines",
-            linesClass: "copy__line line++",
-            lineThreshold: 0.1,
-          });
-
-          splitRefs.current.push(split);
-
-          const computedStyle = window.getComputedStyle(element);
-          const textIndent = computedStyle.textIndent;
-
-          if (textIndent && textIndent !== "0px") {
-            if (split.lines.length > 0) {
-              split.lines[0].style.paddingLeft = textIndent;
-            }
-            element.style.textIndent = "0";
+          let currentLines = [];
+          if (SplitTextMod && typeof SplitTextMod.create === "function") {
+            const split = SplitTextMod.create(element, {
+              type: "lines",
+              mask: "lines",
+              linesClass: "copy__line line++",
+              lineThreshold: 0.1,
+            });
+            splitRefs.current.push(split);
+            currentLines = split.lines || [];
           }
 
-          lines.current.push(...split.lines);
-        });
+          if (!currentLines || currentLines.length === 0) {
+            // safe fallback: wrap element once, animate as a whole block
+            const wrapper = document.createElement("span");
+            wrapper.className = "copy__line";
+            wrapper.style.display = "block";
+            wrapper.style.overflow = "hidden";
+            const inner = document.createElement("span");
+            inner.style.display = "inline-block";
+            inner.style.transform = "translateY(100%)";
+            while (element.firstChild) inner.appendChild(element.firstChild);
+            wrapper.appendChild(inner);
+            element.appendChild(wrapper);
+            currentLines = [inner];
+          }
 
-        gsap.set(lines.current, { y: "100%" });
+          lines.current.push(...currentLines);
+        });
 
         const animationProps = {
           y: "0%",
@@ -101,33 +114,7 @@ export default function Copy({ children, animateOnScroll = true, delay = 0 }) {
           });
         } else {
           gsap.to(lines.current, animationProps);
-
-          setTimeout(() => {
-            if (lines.current.length > 0) {
-              const firstLine = lines.current[0];
-              const computedStyle = window.getComputedStyle(firstLine);
-              if (computedStyle.transform.includes("translateY(100%")) {
-                console.log(
-                  "Copy: Quick fallback triggered for non-scroll animation"
-                );
-                gsap.set(lines.current, { y: "0%" });
-              }
-            }
-          }, 1000);
         }
-
-        setTimeout(() => {
-          if (lines.current.length > 0) {
-            const firstLine = lines.current[0];
-            const computedStyle = window.getComputedStyle(firstLine);
-            if (computedStyle.transform.includes("translateY(100%")) {
-              console.log(
-                "Copy: Animation fallback triggered, forcing text visibility"
-              );
-              gsap.set(lines.current, { y: "0%" });
-            }
-          }
-        }, 3000);
       };
 
       initializeSplitText();

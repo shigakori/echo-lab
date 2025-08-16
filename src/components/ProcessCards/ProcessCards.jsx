@@ -2,6 +2,7 @@
 import "./ProcessCards.css";
 
 import { useGSAP } from "@gsap/react";
+import { prefixPath } from "@/lib/asset";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -93,7 +94,7 @@ const ProcessCards = () => {
               </h1>
 
               <div className="process__card-img process-card-img">
-                <img src={cardData.image} alt="" />
+                <img src={prefixPath(cardData.image)} alt="" />
               </div>
 
               <div className="process__card-copy process-card-copy">
