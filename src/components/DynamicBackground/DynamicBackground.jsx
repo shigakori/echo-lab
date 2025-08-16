@@ -32,12 +32,7 @@ const DynamicBackground = ({ logoPath = "/images/logos/logo_light.png" }) => {
       return;
     }
 
-    if (typeof window !== "undefined" && window.location.pathname !== "/") {
-      console.log(
-        "DynamicBackground: Not on home page, skipping initialization"
-      );
-      return;
-    }
+    // Always initialize when component is mounted
 
     console.log("DynamicBackground: Initializing on home page", { logoPath });
 
@@ -199,10 +194,7 @@ const DynamicBackground = ({ logoPath = "/images/logos/logo_light.png" }) => {
     );
 
     const loadLogo = () => {
-      if (
-        isCleanedUpRef.current ||
-        (typeof window !== "undefined" && window.location.pathname !== "/")
-      ) {
+      if (isCleanedUpRef.current) {
         console.log(
           "DynamicBackground: Skipping logo load - component cleaned up or not on home page"
         );
@@ -217,12 +209,7 @@ const DynamicBackground = ({ logoPath = "/images/logos/logo_light.png" }) => {
       image.crossOrigin = "anonymous";
 
       image.onload = () => {
-        if (
-          isCleanedUpRef.current ||
-          !canvasRef.current ||
-          (typeof window !== "undefined" && window.location.pathname !== "/")
-        )
-          return;
+        if (isCleanedUpRef.current || !canvasRef.current) return;
 
         console.log("DynamicBackground: Logo image loaded successfully", {
           width: image.width,
@@ -299,10 +286,7 @@ const DynamicBackground = ({ logoPath = "/images/logos/logo_light.png" }) => {
     };
 
     function initParticleSystem(pixels, dim) {
-      if (
-        isCleanedUpRef.current ||
-        (typeof window !== "undefined" && window.location.pathname !== "/")
-      ) {
+      if (isCleanedUpRef.current) {
         console.log(
           "DynamicBackground: Skipping particle system init - component cleaned up or not on home page"
         );
@@ -386,13 +370,7 @@ const DynamicBackground = ({ logoPath = "/images/logos/logo_light.png" }) => {
           return;
         }
 
-        if (typeof window !== "undefined" && window.location.pathname !== "/") {
-          console.log(
-            "DynamicBackground: Animation stopped - not on home page"
-          );
-          isCleanedUpRef.current = true;
-          return;
-        }
+        // keep animating while mounted
 
         if (currentTime - lastTime < CONFIG.animationThrottle) {
           animationFrameRef.current = requestAnimationFrame(animate);
