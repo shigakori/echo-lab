@@ -402,7 +402,7 @@ const ProjectPage = () => {
             <div className="project__nav-button project__nav-button--prev">
               <div className="project__nav-image project__nav-image--prev">
                 <img
-                  src={findAdjacentProjects().prev.img}
+                  src={prefixPath(findAdjacentProjects().prev.img)}
                   alt={findAdjacentProjects().prev.name}
                 />
               </div>
@@ -429,7 +429,7 @@ const ProjectPage = () => {
               </button>
               <div className="project__nav-image project__nav-image--next">
                 <img
-                  src={findAdjacentProjects().next.img}
+                  src={prefixPath(findAdjacentProjects().next.img)}
                   alt={findAdjacentProjects().next.name}
                 />
               </div>
