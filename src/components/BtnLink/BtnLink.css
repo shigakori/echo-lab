@@ -1,0 +1,47 @@
+.btn,
+.anime-link {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.btn__label,
+.anime-link-label {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.btn__icon,
+.anime-link-icon {
+  width: 4rem;
+  height: 1.25rem;
+  background-color: var(--btn-icon);
+  border-radius: 5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.btn--dark,
+a.link-dark {
+  color: var(--background);
+}
+
+.btn--light,
+a.link-light {
+  color: var(--foreground);
+}
+
+.btn.btn--dark .btn__icon,
+.anime-link.anime-link-dark .anime-link-icon {
+  background-color: var(--background);
+}
+
+.btn__icon--back,
+.anime-link-icon--back {
+  order: -1;
+}

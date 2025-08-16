@@ -1,0 +1,111 @@
+.process,
+.process-cards {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: var(--background);
+}
+
+.process__card,
+.process-card {
+  position: relative;
+  width: 100vw;
+  height: 100svh;
+  background-color: var(--foreground);
+  color: var(--background);
+  padding: 1.5rem;
+  display: flex;
+  gap: 3rem;
+  will-change: transform;
+}
+
+.process__card::after,
+.process-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: var(--after-opacity, 0);
+  transition: opacity 0.1s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.process__card-index,
+.process-card-index {
+  flex: 2;
+  color: var(--background);
+}
+
+.process__card-content,
+.process-card-content {
+  flex: 4;
+  padding-top: 1.5rem;
+  color: var(--background);
+}
+
+.process__card-content-wrapper,
+.process-card-content-wrapper {
+  width: 75%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.process__card-header,
+.process-card-header {
+  width: 75%;
+}
+
+.process__card-img img,
+.process-card-img img {
+  aspect-ratio: 5/3;
+}
+
+.process__card-copy,
+.process-card-copy {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.process__card-copy-title,
+.process-card-copy-title {
+  flex: 2;
+}
+
+.process__card-copy-description,
+.process-card-copy-description {
+  flex: 4;
+}
+
+@media (max-width: 1000px) {
+  .process__card,
+  .process-card {
+    gap: 0;
+  }
+
+  .process__card,
+  .process__card-copy,
+  .process-card,
+  .process-card-copy {
+    flex-direction: column;
+  }
+
+  .process__card-copy,
+  .process-card-copy {
+    gap: 0.5rem;
+  }
+
+  .process__card-index,
+  .process-card-index {
+    flex: 1;
+  }
+
+  .process__card-content-wrapper,
+  .process-card-content-wrapper {
+    width: 100%;
+  }
+}

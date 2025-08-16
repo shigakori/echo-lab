@@ -1,36 +1,124 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Echo Lab — Next.js
 
-## Getting Started
+Минималистичный сайт-портфолио с анимациями GSAP, маршрутизацией на базе `app/` и поддержкой статической сборки для GitHub Pages.
 
-First, run the development server:
+### Технологии
+
+- Next.js 15 (app router), React 19
+- GSAP + ScrollTrigger + @gsap/react
+- next-view-transitions для плавных переходов
+
+### Структура
+
+- `src/app` — страницы и лэйауты (`work`, `studio`, `contact`, `archive`)
+- `src/components` — переиспользуемые компоненты: `Menu`, `Copy`, `BtnLink`, `Footer`, `DynamicBackground`, `WhoWeAre`, `ProcessCards`
+- `public/images` — изображения, организованы по папкам (`work`, `studio`, `contact`, и т.д.)
+
+### Запуск локально
 
 ```bash
+npm i
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Сборка и предпросмотр статики
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Проект конфигурирован под статический экспорт (Next `output: "export"`).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm run start   # локальный preview может не обслуживать export; используйте любой статик-сервер для ./out
+# пример: npx serve out
+```
 
-## Learn More
+После `npm run build` статика будет в `./out`.
 
-To learn more about Next.js, take a look at the following resources:
+### Базовый путь (GitHub Pages)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+GitHub Pages размещает сайт по адресу `https://<user>.github.io/<repo>/` — поэтому нужен префикс путей.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- В `next.config.js` используется `basePath` и `assetPrefix`, читающие `NEXT_PUBLIC_BASE_PATH`.
+- Для ассетов используется утилита `prefixPath(path)` в `src/lib/asset.js`.
 
-## Deploy on Vercel
+Как установить базовый путь:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Если репозиторий называется `echo-lab`, задайте переменную окружения при сборке:
+   - Linux/macOS:
+     ```bash
+     export NEXT_PUBLIC_BASE_PATH=/echo-lab
+     npm run build
+     ```
+   - Windows PowerShell:
+     ```powershell
+     $env:NEXT_PUBLIC_BASE_PATH="/echo-lab"; npm run build
+     ```
+2. Если деплой на корень (`<user>.github.io`), оставьте переменную пустой.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Обработка путей к изображениям
+
+Все абсолютные пути вида `/images/...` были приведены к `prefixPath('/images/...')`. В компонентах и страницах используйте:
+
+```jsx
+import { prefixPath } from "@/lib/asset";
+<img src={prefixPath("/images/work/work_001.jpeg")} alt="" />;
+```
+
+### Динамические страницы проектов
+
+`/work/[projectId]` — статически экспортируется. Убедитесь, что данные `src/app/work/portfolio.js` содержат валидные `id` и абсолютные пути внутри проекта (`/images/...`).
+
+### Деплой на GitHub Pages
+
+Вариант через Actions:
+
+1. Добавьте workflow `.github/workflows/gh-pages.yml`:
+
+```yaml
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches: ["master", "main"]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - run: NEXT_PUBLIC_BASE_PATH=/${{ github.event.repository.name }} npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: ./out }
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: { name: github-pages, url: ${{ steps.deployment.outputs.page_url }} }
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+2. В настройках репо включите Pages: Deploy from GitHub Actions.
+3. Опционально добавьте пустой файл `.nojekyll` в корень `out` (Actions сделают это автоматически).
+
+Альтернатива вручную:
+
+```bash
+NEXT_PUBLIC_BASE_PATH=/echo-lab npm run build
+npx gh-pages -d out
+```
+
+### Полезные скрипты
+
+- `npm run dev` — dev сервер
+- `npm run build` — статическая сборка (`out/`)
+
+### Примечания
+
+- Для изображений и шрифтов используйте `prefixPath` при обращении к `public/`.
+- В `next.config.js` включены: `output: "export"`, `trailingSlash: true`, `images.unoptimized: true`.
