@@ -13,6 +13,7 @@ const WhoWeAre = () => {
     const whoweareScroll = document.querySelector(
       ".whoweare__scroll, .whoweare-scroll"
     );
+    if (!whoweareScroll) return;
     const containerWidth = whoweareScroll.offsetWidth;
     const viewportWidth = window.innerWidth;
 
@@ -36,9 +37,10 @@ const WhoWeAre = () => {
       onUpdate: (self) => {
         const progress = self.progress;
         const clipPathValue = Math.min(progress * 100, 100);
-
-        gsap.set(".whoweare__container, .whoweare-container", {
+        gsap.to(".whoweare__container, .whoweare-container", {
           clipPath: `circle(${clipPathValue}% at 50% 50%)`,
+          duration: 0.2,
+          ease: "none",
         });
       },
       onComplete: () => {
@@ -60,27 +62,20 @@ const WhoWeAre = () => {
       onUpdate: (self) => {
         const progress = self.progress;
 
-        let opacity, scale, translateX;
+        const fadeProgress = Math.min(progress / 0.2, 1);
+        const scale = 0.9 + 0.1 * fadeProgress;
+        const adjustedProgress = Math.max((progress - 0.2) / 0.8, 0);
+        const translateX = -Math.min(
+          adjustedProgress * maxTranslateAtTarget,
+          maxTranslateX
+        );
 
-        if (progress <= 0.3) {
-          const fadeProgress = progress / 0.3;
-          opacity = fadeProgress;
-          scale = 0.85 + 0.15 * fadeProgress;
-          translateX = 0;
-        } else {
-          opacity = 1;
-          scale = 1;
-          const adjustedProgress = (progress - 0.3) / (1 - 0.3);
-          translateX = -Math.min(
-            adjustedProgress * maxTranslateAtTarget,
-            maxTranslateX
-          );
-        }
-
-        gsap.set(whoweareScroll, {
-          opacity: opacity,
-          scale: scale,
+        gsap.to(whoweareScroll, {
+          opacity: fadeProgress,
+          scale,
           x: translateX,
+          duration: 0.2,
+          ease: "none",
         });
       },
     });

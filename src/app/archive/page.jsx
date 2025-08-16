@@ -3,6 +3,7 @@ import "./archive.css";
 import { useRef, useEffect, useState } from "react";
 
 import gsap from "gsap";
+import { prefixPath } from "@/lib/asset";
 
 const Archive = () => {
   const galleryRef = useRef(null);
@@ -46,7 +47,9 @@ const Archive = () => {
 
       const imgElement = document.createElement("img");
       const randomImageNumber = Math.floor(Math.random() * 50) + 1;
-      imgElement.src = `/images/archive/img${randomImageNumber}.jpeg`;
+      imgElement.src = prefixPath(
+        `/images/archive/img${randomImageNumber}.jpeg`
+      );
       img.appendChild(imgElement);
 
       gallery.appendChild(img);
