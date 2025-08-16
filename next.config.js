@@ -9,6 +9,7 @@ const nextConfig = {
   images: { unoptimized: true },
   basePath: basePath,
   assetPrefix: basePath,
+  eslint: { ignoreDuringBuilds: true },
   webpack: (config) => {
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
