@@ -1,11 +1,12 @@
 .copy__line,
 .line {
   position: relative;
-  transform: translateY(100%);
+  display: block;
+  overflow: hidden;
+}
+
+.copy__line > * {
+  display: inline-block;
   will-change: transform;
-  max-width: 100%;
-  word-wrap: break-word;
-  hyphens: auto;
-  overflow-wrap: break-word;
-  word-break: normal;
+  transform: translateY(100%);
 }
