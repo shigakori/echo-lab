@@ -37,10 +37,8 @@ const WhoWeAre = () => {
       onUpdate: (self) => {
         const progress = self.progress;
         const clipPathValue = Math.min(progress * 100, 100);
-        gsap.to(".whoweare__container, .whoweare-container", {
+        gsap.set(".whoweare__container, .whoweare-container", {
           clipPath: `circle(${clipPathValue}% at 50% 50%)`,
-          duration: 0.2,
-          ease: "none",
         });
       },
       onComplete: () => {
@@ -70,12 +68,10 @@ const WhoWeAre = () => {
           maxTranslateX
         );
 
-        gsap.to(whoweareScroll, {
+        gsap.set(whoweareScroll, {
           opacity: fadeProgress,
           scale,
           x: translateX,
-          duration: 0.2,
-          ease: "none",
         });
       },
     });
