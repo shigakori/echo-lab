@@ -50,7 +50,7 @@ const DynamicBackground = ({ logoPath = "/images/logos/logo_light.png" }) => {
       "DynamicBackground: Device check passed, proceeding with initialization"
     );
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     canvas.width = window.innerWidth * dpr;
     canvas.height = window.innerHeight * dpr;
     canvas.style.width = window.innerWidth + "px";
@@ -372,7 +372,12 @@ const DynamicBackground = ({ logoPath = "/images/logos/logo_light.png" }) => {
 
         // keep animating while mounted
 
-        if (currentTime - lastTime < CONFIG.animationThrottle) {
+        if (
+          currentTime - lastTime <
+          (window.innerWidth < 1000
+            ? CONFIG.animationThrottle * 2
+            : CONFIG.animationThrottle)
+        ) {
           animationFrameRef.current = requestAnimationFrame(animate);
           return;
         }

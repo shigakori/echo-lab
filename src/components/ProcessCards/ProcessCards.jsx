@@ -41,43 +41,51 @@ const ProcessCards = () => {
   ];
 
   useGSAP(() => {
-    const processCards = document.querySelectorAll(
-      ".process__card, .process-card"
-    );
+    const isMobile = window.matchMedia("(max-width: 999px)").matches;
+    const cards = document.querySelectorAll(".process__card, .process-card");
+    const triggers = [];
 
-    processCards.forEach((card, index) => {
-      if (index < processCards.length - 1) {
-        ScrollTrigger.create({
-          trigger: card,
-          start: "top top",
-          endTrigger: processCards[processCards.length - 1],
-          end: "top top",
-          pin: true,
-          pinSpacing: false,
-          id: `card-pin-${index}`,
-        });
-      }
+    cards.forEach((card, index) => {
+      const last = index === cards.length - 1;
+      if (!last) {
+        triggers.push(
+          ScrollTrigger.create({
+            trigger: card,
+            start: "top top",
+            endTrigger: cards[cards.length - 1],
+            end: "top top",
+            pin: true,
+            pinSpacing: false,
+            id: `card-pin-${index}`,
+            scrub: isMobile ? 0.6 : 1,
+          })
+        );
 
-      if (index < processCards.length - 1) {
-        ScrollTrigger.create({
-          trigger: processCards[index + 1],
-          start: "top bottom",
-          end: "top top",
-          onUpdate: (self) => {
-            const progress = self.progress;
-            const scale = 1 - progress * 0.25;
-            const rotation = (index % 2 === 0 ? 5 : -5) * progress;
-            const afterOpacity = progress;
-
-            gsap.set(card, {
-              scale: scale,
-              rotation: rotation,
-              "--after-opacity": afterOpacity,
-            });
-          },
-        });
+        triggers.push(
+          ScrollTrigger.create({
+            trigger: cards[index + 1],
+            start: "top bottom",
+            end: "top top",
+            scrub: isMobile ? 0.6 : 1,
+            onUpdate: (self) => {
+              const progress = self.progress;
+              const scale = 1 - progress * (isMobile ? 0.15 : 0.25);
+              const rotation =
+                (index % 2 === 0 ? (isMobile ? 3 : 5) : isMobile ? -3 : -5) *
+                progress;
+              const afterOpacity = progress;
+              gsap.set(card, {
+                scale,
+                rotation,
+                "--after-opacity": afterOpacity,
+              });
+            },
+          })
+        );
       }
     });
+
+    return () => triggers.forEach((t) => t.kill());
   }, []);
 
   return (

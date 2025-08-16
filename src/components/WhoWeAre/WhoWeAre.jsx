@@ -10,90 +10,112 @@ gsap.registerPlugin(ScrollTrigger);
 
 const WhoWeAre = () => {
   useGSAP(() => {
-    const whoweareScroll = document.querySelector(
-      ".whoweare__scroll, .whoweare-scroll"
-    );
-    if (!whoweareScroll) return;
-    const containerWidth = whoweareScroll.offsetWidth;
-    const viewportWidth = window.innerWidth;
+    const setup = (mobile = false) => {
+      const whoweareScroll = document.querySelector(
+        ".whoweare__scroll, .whoweare-scroll"
+      );
+      if (!whoweareScroll) return [];
+      const containerWidth = whoweareScroll.offsetWidth;
+      const viewportWidth = window.innerWidth;
 
-    const maxTranslateX = containerWidth - viewportWidth;
-    const targetProgress = 1;
-    const maxTranslateAtTarget = maxTranslateX / targetProgress;
+      const maxTranslateX = Math.max(containerWidth - viewportWidth, 0);
+      const endLen = mobile ? window.innerHeight * 4 : window.innerHeight * 6;
 
-    const images = [
-      { id: "#whoweare-img-1", endTranslateX: -800 },
-      { id: "#whoweare-img-2", endTranslateX: -1200 },
-      { id: "#whoweare-img-3", endTranslateX: -600 },
-      { id: "#whoweare-img-4", endTranslateX: -1000 },
-      { id: "#whoweare-img-5", endTranslateX: -900 },
-    ];
+      const images = [
+        { id: "#whoweare-img-1", endTranslateX: mobile ? -400 : -800 },
+        { id: "#whoweare-img-2", endTranslateX: mobile ? -600 : -1200 },
+        { id: "#whoweare-img-3", endTranslateX: mobile ? -300 : -600 },
+        { id: "#whoweare-img-4", endTranslateX: mobile ? -500 : -1000 },
+        { id: "#whoweare-img-5", endTranslateX: mobile ? -450 : -900 },
+      ];
 
-    ScrollTrigger.create({
-      trigger: ".whoweare",
-      start: "top bottom",
-      end: `bottom+=${window.innerHeight * 2} top`,
-      scrub: 1,
-      onUpdate: (self) => {
-        const progress = self.progress;
-        const clipPathValue = Math.min(progress * 100, 100);
-        gsap.set(".whoweare__container, .whoweare-container", {
-          clipPath: `circle(${clipPathValue}% at 50% 50%)`,
-        });
-      },
-      onComplete: () => {
-        gsap.set(".whoweare__container, .whoweare-container", {
-          clipPath: `circle(100% at 50% 50%)`,
-        });
-      },
-    });
+      const triggers = [];
 
-    ScrollTrigger.create({
-      trigger: ".whoweare",
-      start: "top top",
-      end: `+=${window.innerHeight * 6}`,
-      pin: true,
-      pinSpacing: true,
-      scrub: 1,
-      anticipatePin: 0.5,
-      invalidateOnRefresh: true,
-      onUpdate: (self) => {
-        const progress = self.progress;
-
-        const fadeProgress = Math.min(progress / 0.2, 1);
-        const scale = 0.9 + 0.1 * fadeProgress;
-        const adjustedProgress = Math.max((progress - 0.2) / 0.8, 0);
-        const translateX = -Math.min(
-          adjustedProgress * maxTranslateAtTarget,
-          maxTranslateX
-        );
-
-        gsap.set(whoweareScroll, {
-          opacity: fadeProgress,
-          scale,
-          x: translateX,
-        });
-      },
-    });
-
-    images.forEach((img) => {
-      ScrollTrigger.create({
-        trigger: ".whoweare",
-        start: "top top",
-        end: `+=${window.innerHeight * 6}`,
-        scrub: 1,
-        onUpdate: (self) => {
-          const progress = self.progress;
-
-          if (progress >= 0.3) {
-            const adjustedProgress = (progress - 0.3) / (1 - 0.3);
-            gsap.set(img.id, {
-              x: `${img.endTranslateX * adjustedProgress}px`,
+      triggers.push(
+        ScrollTrigger.create({
+          trigger: ".whoweare",
+          start: "top bottom",
+          end: `bottom+=${window.innerHeight * 2} top`,
+          scrub: mobile ? 0.6 : 1,
+          onUpdate: (self) => {
+            const progress = self.progress;
+            const clipPathValue = Math.min(progress * 100, 100);
+            gsap.set(".whoweare__container, .whoweare-container", {
+              clipPath: `circle(${clipPathValue}% at 50% 50%)`,
             });
-          }
-        },
+          },
+          onComplete: () => {
+            gsap.set(".whoweare__container, .whoweare-container", {
+              clipPath: `circle(100% at 50% 50%)`,
+            });
+          },
+        })
+      );
+
+      triggers.push(
+        ScrollTrigger.create({
+          trigger: ".whoweare",
+          start: "top top",
+          end: `+=${endLen}`,
+          pin: true,
+          pinSpacing: true,
+          scrub: mobile ? 0.6 : 1,
+          anticipatePin: 0.3,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            const progress = self.progress;
+            const fadeProgress = Math.min(progress / 0.2, 1);
+            const scale = (mobile ? 0.92 : 0.9) + 0.1 * fadeProgress;
+            const adjustedProgress = Math.max((progress - 0.2) / 0.8, 0);
+            const translateX = -Math.min(
+              adjustedProgress * maxTranslateX,
+              maxTranslateX
+            );
+
+            gsap.set(whoweareScroll, {
+              opacity: fadeProgress,
+              scale,
+              x: translateX,
+            });
+          },
+        })
+      );
+
+      images.forEach((img) => {
+        triggers.push(
+          ScrollTrigger.create({
+            trigger: ".whoweare",
+            start: "top top",
+            end: `+=${endLen}`,
+            scrub: mobile ? 0.6 : 1,
+            onUpdate: (self) => {
+              const progress = self.progress;
+              if (progress >= 0.3) {
+                const adjustedProgress = (progress - 0.3) / (1 - 0.3);
+                gsap.set(img.id, {
+                  x: `${img.endTranslateX * adjustedProgress}px`,
+                });
+              }
+            },
+          })
+        );
       });
-    });
+
+      return triggers;
+    };
+
+    const mql = window.matchMedia("(max-width: 999px)");
+    let currentTriggers = setup(mql.matches);
+    const onChange = () => {
+      currentTriggers.forEach((t) => t.kill());
+      currentTriggers = setup(mql.matches);
+    };
+    mql.addEventListener("change", onChange);
+
+    return () => {
+      mql.removeEventListener("change", onChange);
+      currentTriggers.forEach((t) => t.kill());
+    };
   }, []);
 
   return (
