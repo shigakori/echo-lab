@@ -3,6 +3,14 @@ import "./globals.css";
 import ClientLayout from "@/client-layout";
 
 import { ViewTransitions } from "next-view-transitions";
+import localFont from "next/font/local";
+
+const nm = localFont({
+  src: "/fonts/nm/nm-medium.otf",
+  variable: "--font-nm",
+  display: "swap",
+  weight: "500",
+});
 
 export const metadata = {
   title: {
@@ -77,7 +85,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      <body suppressHydrationWarning={true}>
+      <body suppressHydrationWarning={true} className={nm.variable}>
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){

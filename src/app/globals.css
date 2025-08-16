@@ -23,7 +23,7 @@
 }
 
 body {
-  font-family: "nm";
+  font-family: var(--font-nm), system-ui, -apple-system, Segoe UI, Roboto;
   background-color: #000;
   overflow-x: hidden;
 }
