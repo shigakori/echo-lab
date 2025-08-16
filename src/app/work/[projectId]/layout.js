@@ -91,3 +91,9 @@ export async function generateMetadata({ params }) {
 export default function ProjectLayout({ children }) {
   return children;
 }
+
+export function generateStaticParams() {
+  return portfolio.flatMap((yearData) =>
+    yearData.projects.map((p) => ({ projectId: p.id }))
+  );
+}

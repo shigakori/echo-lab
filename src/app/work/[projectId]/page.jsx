@@ -10,12 +10,6 @@ import { useGSAP } from "@gsap/react";
 import Copy from "@/components/Copy/Copy";
 import BtnLink from "@/components/BtnLink/BtnLink";
 import { prefixPath } from "@/lib/asset";
-
-export function generateStaticParams() {
-  return portfolio.flatMap((yearData) =>
-    yearData.projects.map((p) => ({ projectId: p.id }))
-  );
-}
 import "./project-page.css";
 
 gsap.registerPlugin(ScrollTrigger);
