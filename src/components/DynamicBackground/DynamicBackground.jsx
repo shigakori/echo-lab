@@ -32,7 +32,13 @@ const DynamicBackground = ({ logoPath = "/images/logos/logo_light.png" }) => {
       return;
     }
 
-    // Always initialize when component is mounted
+    // Инициализация только на главной
+    if (typeof window !== "undefined" && window.location.pathname !== "/") {
+      console.log(
+        "DynamicBackground: Not on home page, skipping initialization"
+      );
+      return;
+    }
 
     console.log("DynamicBackground: Initializing on home page", { logoPath });
 
@@ -50,7 +56,7 @@ const DynamicBackground = ({ logoPath = "/images/logos/logo_light.png" }) => {
       "DynamicBackground: Device check passed, proceeding with initialization"
     );
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = window.innerWidth * dpr;
     canvas.height = window.innerHeight * dpr;
     canvas.style.width = window.innerWidth + "px";
@@ -194,7 +200,10 @@ const DynamicBackground = ({ logoPath = "/images/logos/logo_light.png" }) => {
     );
 
     const loadLogo = () => {
-      if (isCleanedUpRef.current) {
+      if (
+        isCleanedUpRef.current ||
+        (typeof window !== "undefined" && window.location.pathname !== "/")
+      ) {
         console.log(
           "DynamicBackground: Skipping logo load - component cleaned up or not on home page"
         );
@@ -209,7 +218,12 @@ const DynamicBackground = ({ logoPath = "/images/logos/logo_light.png" }) => {
       image.crossOrigin = "anonymous";
 
       image.onload = () => {
-        if (isCleanedUpRef.current || !canvasRef.current) return;
+        if (
+          isCleanedUpRef.current ||
+          !canvasRef.current ||
+          (typeof window !== "undefined" && window.location.pathname !== "/")
+        )
+          return;
 
         console.log("DynamicBackground: Logo image loaded successfully", {
           width: image.width,
@@ -286,7 +300,10 @@ const DynamicBackground = ({ logoPath = "/images/logos/logo_light.png" }) => {
     };
 
     function initParticleSystem(pixels, dim) {
-      if (isCleanedUpRef.current) {
+      if (
+        isCleanedUpRef.current ||
+        (typeof window !== "undefined" && window.location.pathname !== "/")
+      ) {
         console.log(
           "DynamicBackground: Skipping particle system init - component cleaned up or not on home page"
         );
@@ -370,14 +387,16 @@ const DynamicBackground = ({ logoPath = "/images/logos/logo_light.png" }) => {
           return;
         }
 
-        // keep animating while mounted
+        // Останавливаем если ушли с главной
+        if (typeof window !== "undefined" && window.location.pathname !== "/") {
+          console.log(
+            "DynamicBackground: Animation stopped - not on home page"
+          );
+          isCleanedUpRef.current = true;
+          return;
+        }
 
-        if (
-          currentTime - lastTime <
-          (window.innerWidth < 1000
-            ? CONFIG.animationThrottle * 2
-            : CONFIG.animationThrottle)
-        ) {
+        if (currentTime - lastTime < CONFIG.animationThrottle) {
           animationFrameRef.current = requestAnimationFrame(animate);
           return;
         }
