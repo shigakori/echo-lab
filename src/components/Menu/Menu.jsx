@@ -30,9 +30,9 @@ const Menu = ({ onMenuStateChange }) => {
   ];
 
   const socialLinks = [
-    { url: "https://www.youtube.com/@shigakori", label: "YouTube" },
-    { url: "https://www.instagram.com/shigakori/", label: "Instagram" },
-    { url: "https://x.com/shigakori", label: "X" },
+    { url: "https://www.youtube.com", label: "YouTube" },
+    { url: "https://www.instagram.com", label: "Instagram" },
+    { url: "https://x.com", label: "X" },
   ];
 
   const menuRef = useRef(null);
