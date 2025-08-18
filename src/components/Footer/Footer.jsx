@@ -300,39 +300,13 @@ const Footer = () => {
             </div>
             <div className="footer__social">
               <a
-                href="https://www.behance.net/shigakori"
-                onMouseEnter={handleSocialLinkHover}
-                onMouseLeave={handleSocialLinkLeave}
-              >
-                <div className="footer__text">
-                  <div className="footer__text-content">
-                    <p>Behance</p>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div className="footer__social">
-              <a
-                href="https://www.instagram.com/shigakori/"
+                href="https://www.instagram.com"
                 onMouseEnter={handleSocialLinkHover}
                 onMouseLeave={handleSocialLinkLeave}
               >
                 <div className="footer__text">
                   <div className="footer__text-content">
                     <p>Instagram</p>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div className="footer__social">
-              <a
-                href="https://vimeo.com/shigakori"
-                onMouseEnter={handleSocialLinkHover}
-                onMouseLeave={handleSocialLinkLeave}
-              >
-                <div className="footer__text">
-                  <div className="footer__text-content">
-                    <p>Vimeo</p>
                   </div>
                 </div>
               </a>
@@ -345,7 +319,16 @@ const Footer = () => {
         <div className="footer__copy-col-lg">
           <div className="footer__text">
             <div className="footer__text-content">
-              <p className="sm caps">Developed by Shigakori</p>
+              <p className="sm caps">
+                Developed by{" "}
+                <a
+                  href="https://github.com/shigakori"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Shigakori
+                </a>
+              </p>
             </div>
           </div>
         </div>
