@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from "react";
 
 import { useTransitionRouter } from "next-view-transitions";
 import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(ScrollTrigger);

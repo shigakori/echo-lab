@@ -4,7 +4,7 @@ import { portfolio } from "../portfolio";
 import { useRef, useEffect } from "react";
 import { useTransitionRouter } from "next-view-transitions";
 import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import { useGSAP } from "@gsap/react";
 import Copy from "@/components/Copy/Copy";

@@ -9,7 +9,7 @@ import { prefixPath } from "@/lib/asset";
 
 import { useTransitionRouter } from "next-view-transitions";
 import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ScrollToPlugin from "gsap/ScrollToPlugin";
 import { useGSAP } from "@gsap/react";
 

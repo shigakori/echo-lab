@@ -85,7 +85,20 @@ const ProcessCards = () => {
       }
     });
 
-    return () => triggers.forEach((t) => t.kill());
+    // ensure proper recalculation on load to avoid first-visit pin glitches
+    const refresh = () => {
+      try {
+        ScrollTrigger.refresh();
+      } catch {}
+    };
+    const raf = requestAnimationFrame(refresh);
+    window.addEventListener("load", refresh, { once: true });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("load", refresh);
+      triggers.forEach((t) => t.kill());
+    };
   }, []);
 
   return (

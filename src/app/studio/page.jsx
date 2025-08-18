@@ -11,7 +11,7 @@ import { prefixPath } from "@/lib/asset";
 
 import gsap from "gsap";
 import { SplitText } from "gsap/SplitText";
-import ScrollTrigger from "gsap/ScrollTrigger";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
@@ -119,6 +119,18 @@ const page = () => {
           },
         });
       }
+
+      const refresh = () => {
+        try {
+          ScrollTrigger.refresh();
+        } catch {}
+      };
+      const raf = requestAnimationFrame(refresh);
+      window.addEventListener("load", refresh, { once: true });
+      return () => {
+        cancelAnimationFrame(raf);
+        window.removeEventListener("load", refresh);
+      };
     },
     { dependencies: [isClient] }
   );
