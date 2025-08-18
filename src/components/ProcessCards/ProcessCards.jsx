@@ -42,48 +42,88 @@ const ProcessCards = () => {
 
   useGSAP(() => {
     const isMobile = window.matchMedia("(max-width: 999px)").matches;
-    const cards = document.querySelectorAll(".process__card, .process-card");
-    const triggers = [];
+    const container = document.querySelector(
+      ".process.process-cards, .process-cards"
+    );
+    if (!container) return;
 
-    cards.forEach((card, index) => {
-      const last = index === cards.length - 1;
-      if (!last) {
-        triggers.push(
-          ScrollTrigger.create({
-            trigger: card,
-            start: "top top",
-            endTrigger: cards[cards.length - 1],
-            end: "top top",
-            pin: true,
-            pinSpacing: false,
-            id: `card-pin-${index}`,
-            scrub: isMobile ? 0.6 : 1,
-          })
-        );
-
-        triggers.push(
-          ScrollTrigger.create({
-            trigger: cards[index + 1],
-            start: "top bottom",
-            end: "top top",
-            scrub: isMobile ? 0.6 : 1,
-            onUpdate: (self) => {
-              const progress = self.progress;
-              const scale = 1 - progress * (isMobile ? 0.15 : 0.25);
-              const rotation =
-                (index % 2 === 0 ? (isMobile ? 3 : 5) : isMobile ? -3 : -5) *
-                progress;
-              const afterOpacity = progress;
-              gsap.set(card, {
-                scale,
-                rotation,
-                "--after-opacity": afterOpacity,
-              });
-            },
-          })
-        );
-      }
+    // hide until container is near viewport to prevent early flash over pin sections above
+    gsap.set(container, { opacity: 0 });
+    const revealTrigger = ScrollTrigger.create({
+      trigger: container,
+      start: "top 80%",
+      once: true,
+      onEnter: () => {
+        gsap.to(container, { opacity: 1, duration: 0.4, ease: "power2.out" });
+      },
     });
+
+    const setup = () => {
+      const cards = container.querySelectorAll(".process__card, .process-card");
+      const localTriggers = [];
+
+      cards.forEach((card, index) => {
+        const last = index === cards.length - 1;
+        if (!last) {
+          localTriggers.push(
+            ScrollTrigger.create({
+              trigger: card,
+              start: "top top",
+              endTrigger: cards[cards.length - 1],
+              end: "top top",
+              pin: true,
+              pinSpacing: false,
+              pinnedContainer: container,
+              id: `card-pin-${index}`,
+              scrub: isMobile ? 0.6 : 1,
+            })
+          );
+
+          localTriggers.push(
+            ScrollTrigger.create({
+              trigger: cards[index + 1],
+              start: "top bottom",
+              end: "top top",
+              scrub: isMobile ? 0.6 : 1,
+              onUpdate: (self) => {
+                const progress = self.progress;
+                const scale = 1 - progress * (isMobile ? 0.15 : 0.25);
+                const rotation =
+                  (index % 2 === 0 ? (isMobile ? 3 : 5) : isMobile ? -3 : -5) *
+                  progress;
+                const afterOpacity = progress;
+                gsap.set(card, {
+                  scale,
+                  rotation,
+                  "--after-opacity": afterOpacity,
+                });
+              },
+            })
+          );
+        }
+      });
+
+      return () => localTriggers.forEach((t) => t.kill());
+    };
+
+    let killSetup = () => {};
+
+    const whoweare = document.querySelector(".whoweare");
+    if (whoweare) {
+      ScrollTrigger.create({
+        trigger: whoweare,
+        start: "bottom bottom",
+        once: true,
+        onEnter: () => {
+          killSetup = setup();
+          try {
+            ScrollTrigger.refresh();
+          } catch {}
+        },
+      });
+    } else {
+      killSetup = setup();
+    }
 
     // ensure proper recalculation on load to avoid first-visit pin glitches
     const refresh = () => {
@@ -97,7 +137,8 @@ const ProcessCards = () => {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("load", refresh);
-      triggers.forEach((t) => t.kill());
+      revealTrigger.kill();
+      killSetup();
     };
   }, []);
 
