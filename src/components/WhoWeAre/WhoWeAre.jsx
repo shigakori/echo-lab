@@ -104,16 +104,73 @@ const WhoWeAre = () => {
       return triggers;
     };
 
-    const mql = window.matchMedia("(max-width: 999px)");
-    let currentTriggers = setup(mql.matches);
-    const onChange = () => {
-      currentTriggers.forEach((t) => t.kill());
-      currentTriggers = setup(mql.matches);
+    const waitForImages = () => {
+      return new Promise((resolve) => {
+        const nodeList = document.querySelectorAll(
+          ".whoweare__scroll img, .whoweare-scroll img"
+        );
+        const images = Array.from(nodeList);
+        if (images.length === 0) {
+          resolve();
+          return;
+        }
+        let loadedCount = 0;
+        const checkDone = () => {
+          loadedCount += 1;
+          if (loadedCount >= images.length) resolve();
+        };
+        images.forEach((img) => {
+          if (img.complete) {
+            checkDone();
+          } else {
+            const onLoad = () => {
+              img.removeEventListener("load", onLoad);
+              img.removeEventListener("error", onLoad);
+              checkDone();
+            };
+            img.addEventListener("load", onLoad);
+            img.addEventListener("error", onLoad);
+          }
+        });
+        // safety timeout
+        setTimeout(resolve, 1200);
+      });
     };
-    mql.addEventListener("change", onChange);
+
+    let currentTriggers = [];
+    const init = () => {
+      const mql = window.matchMedia("(max-width: 999px)");
+      currentTriggers = setup(mql.matches);
+      const onChange = () => {
+        currentTriggers.forEach((t) => t.kill());
+        currentTriggers = setup(mql.matches);
+        try {
+          ScrollTrigger.refresh();
+        } catch {}
+      };
+      mql.addEventListener("change", onChange);
+      // keep reference for cleanup
+      return () => mql.removeEventListener("change", onChange);
+    };
+
+    let removeMqlListener = () => {};
+    waitForImages().then(() => {
+      removeMqlListener = init();
+      try {
+        ScrollTrigger.refresh();
+      } catch {}
+    });
+
+    const onWindowLoad = () => {
+      try {
+        ScrollTrigger.refresh();
+      } catch {}
+    };
+    window.addEventListener("load", onWindowLoad, { once: true });
 
     return () => {
-      mql.removeEventListener("change", onChange);
+      window.removeEventListener("load", onWindowLoad);
+      removeMqlListener();
       currentTriggers.forEach((t) => t.kill());
     };
   }, []);
