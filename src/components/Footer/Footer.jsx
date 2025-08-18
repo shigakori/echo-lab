@@ -322,6 +322,7 @@ const Footer = () => {
               <p className="sm caps">
                 Developed by{" "}
                 <a
+                  className="sm caps"
                   href="https://github.com/shigakori"
                   target="_blank"
                   rel="noopener noreferrer"

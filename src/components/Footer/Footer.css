@@ -73,6 +73,11 @@
   color: var(--foreground);
 }
 
+.footer__copy .sm.caps a.sm.caps {
+  font: inherit;
+  letter-spacing: inherit;
+}
+
 .footer__text {
   overflow: hidden;
 }
